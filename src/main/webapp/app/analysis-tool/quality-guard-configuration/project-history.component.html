@@ -1,0 +1,110 @@
+<div class="content">
+    <h5>Quality Rules</h5>
+    <div class="table-responsive" *ngIf="qualityGuardsByProject">
+        <table class="guard-table">
+            <tbody *ngFor='let qualityGuard of qualityGuardsByProject; let i = index' [attr.data-index]='i'>
+                <tr *ngIf="i == 0">
+                    <td colspan="5">
+                        <span>
+                            <select class="dropDownPosition" name="intervalAgregation" id="field_intervalAgregation" [(ngModel)]="selectedIntervalAgregation" (change)="getIncidentStatus($event.target.value)">
+                                <option value="MOY_MIN">last minutes</option>
+                                <option value="MOY_HH">last hours</option>
+                                <option value="MOY_DD">last days</option>
+                                <option value="MOY_WW">last weeks</option>
+                                <option value="MOY_MM">last months</option>
+                            </select>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="padding-top: 30px;" >
+                            <h4>{{qualityGuard.qualityGuardName}}</h4>
+                        </div>
+                    </td>
+                    <td>
+                            <div>
+                                    <small>Status</small>
+                            </div>
+                            <div>
+                                <div *ngIf="qualityGuard.violation==null" class="guard-success-sm" style="height:40px;padding-top: 10px;"><span class="guard-date">Success</span></div>
+                                <div *ngIf="qualityGuard.violation!==null && qualityGuard.violation.violationStatus=='WARNING'"  class="guard-warning-sm" style="height:40px;padding-top: 10px;"><span class="guard-date">Warning</span></div>
+                                <div *ngIf="qualityGuard.violation!==null && qualityGuard.violation.violationStatus=='ERROR'"   class="guard-error-sm" style="height:40px;padding-top: 10px;"><span class="guard-date">Error</span></div>
+                            </div>
+                    </td>
+                    <td>
+                        <div><small>Last incident date</small></div>
+                        <div *ngIf="qualityGuard.violations?.length > 0"   class="guard-box">  {{qualityGuard.violations[0].incidentStartDate | date: 'dd-MM-yyyy HH:mm:ss'}}</div>
+                    </td>
+                    <td>
+                        <div>
+                                <small>Incident History</small>
+                        </div>
+                        <div>
+                            <span *ngFor='let incident of qualityGuard.incidentsHistory'>
+                                <div *ngIf="incident.guardStatus=='SUCCESS'" class="guard-success"><span class="guard-date">{{incident.dateStatus}}</span></div>
+                                <div *ngIf="incident.guardStatus=='WARNING'"  class="guard-warning"><span class="guard-date">{{incident.dateStatus}}</span></div>
+                                <div *ngIf="incident.guardStatus=='ERROR'"   class="guard-error"><span class="guard-date">{{incident.dateStatus}}</span></div>
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        <button style="padding-top: 20px;" class="btn btn-primary btn-sm" style="float: right;" (click)="toggleRowDetails(i)"> 
+                            <span *ngIf="rowSelected!=i; else close">
+                                <i class="fa fa-plus" aria-hidden="true"></i>
+                            </span>
+                            <ng-template #close>
+                                <i class="fa fa-minus" aria-hidden="true"></i>
+                            </ng-template>
+                            Incidents
+                        </button>
+                    </td>
+                </tr>
+                <tr *ngIf="rowSelected == i">
+                    <td colspan="5">
+                        <div class="guard-emphase">
+                            RULE : 
+                            <span *ngFor="let guardCondition of qualityGuard.guardConditions;let j = index" [attr.data-index]="j">
+                                <span>
+                                    <span>{{guardCondition.measureInstance}}</span> <span>{{guardCondition.operator}}</span> (
+                                    <span>{{guardCondition.warningValue}}</span> | <span>{{guardCondition.errorValue}}</span> )
+                                </span>
+                                <span *ngIf="qualityGuard.combinationMode && qualityGuard.guardConditions.length != j+1">
+                                    <span>{{qualityGuard.combinationMode}}</span>
+                                </span>
+                            </span>
+                        </div>
+                       
+                        <table class="guard-table" style="width:50%">
+                            <thead>
+                                <tr>
+                                    <th>Incidents</th>
+                                    <th>Incidents Start Date</th>
+                                    <th>Incidents End Date</th>
+                                    <th *ngFor='let guardCondition of qualityGuard.guardConditions'>{{guardCondition.measureInstance}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor='let violation of qualityGuard.violations'>
+                                    <td>
+                                        <div *ngIf="violation.violationStatus=='WARNING'"  class="guard-warning-sm"><span class="guard-date">Warning</span></div>
+                                        <div *ngIf="violation.violationStatus=='ERROR'"   class="guard-error-sm"><span class="guard-date">Error</span></div>
+                                    </td>
+                                    <td>
+                                        <span>{{violation.incidentStartDate | date: 'dd-MM-yyyy HH:mm:ss'}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{violation.incidentEndDate | date: 'dd-MM-yyyy HH:mm:ss'}}</span>
+                                    </td>
+                                    <td *ngFor='let conditionViolation of violation.conditionViolations'>
+                                        <span *ngIf="conditionViolation.conditionStatus">{{conditionViolation.conditionValue}}</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </td>
+                    </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

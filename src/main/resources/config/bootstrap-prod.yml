@@ -1,0 +1,14 @@
+# ===================================================================
+# Spring Cloud Config bootstrap configuration for the "prod" profile
+# ===================================================================
+
+spring:
+    cloud:
+        discovery:
+            enabled: false
+        config:
+            fail-fast: false
+
+jhipster:
+    registry:
+        password: admin
